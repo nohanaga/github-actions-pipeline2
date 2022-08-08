@@ -1,0 +1,20 @@
+name: Azure ML Trigger Pipeline Sample
+
+on:
+  repository_dispatch:
+    types: [on-demand-test]
+    
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Log in with Azure
+        uses: azure/login@v1
+        with:
+          creds: '${{secrets.AZURE_CREDENTIALS}}'
+      - name: Install ML extension for az command
+        run: az extension add --name ml --version 2.4.1
+      - name: AML Pipeline Job Command
+        run: az ml online-deployment create --file 03_managed_deployment.yml -g ${{ secrets.AZURE_RESOURCE_GROUP_NAME }} -w ${{ secrets.AZURE_ML_WORKSPACE_NAME }} --all-traffic
